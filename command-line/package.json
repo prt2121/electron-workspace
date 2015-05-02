@@ -1,5 +1,8 @@
 {
-  "name"    : "command-line",
-  "version" : "0.1.0",
-  "main"    : "main.js"
+  "name": "command-line",
+  "version": "0.1.0",
+  "main": "main.js",
+  "dependencies": {
+    "adbkit": "^2.2.1"
+  }
 }
