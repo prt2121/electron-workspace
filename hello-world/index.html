@@ -7,11 +7,14 @@
 <body>
   <div id="hello-button" class="btn btn-default">hello, world!</div>
   <div id="foo-button" class="btn btn-default">mkdir foo</div>
+  <br>
+  <input type="text" class="form-control" id="input" placeholder="Jane Doe"></input>
+  <input id="copy-input" type="text" class="form-control"></input>
   <div>
     We are using io.js <script>document.write(process.version)</script>
     and Electron <script>document.write(process.versions['electron'])</script>.
-    <script src="index.js"></script>
   </div>
-
+  <div id="content-container"></div>
+  <script src="index.js"></script>
 </body>
 </html>
