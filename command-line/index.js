@@ -6,16 +6,41 @@ var client = adb.createClient();
 var fs = require('fs');
 var StreamPng = require('StreamPng');
 var serial = document.querySelector('#serial');
+var command = document.querySelector('#command');
 
 $('#ls-button').on('click', function () {
   console.log('ls');
   list()
 })
 
-$('#run-button').on('click', function () {
+$('#capture-button').on('click', function () {
   console.log('run ' + serial.value);
   screencap(serial.value);
 })
+
+$('#command-button').on('click', function () {
+  console.log('run ' + serial.value);
+  run(command.value);
+})
+
+function run(script) {
+  client.listDevices()
+  .then(function(devices) {
+    return Promise.map(devices, function(device) {
+      return client.shell(device.id, script)
+      .then(adb.util.readAll)
+      .then(function(output) {
+        console.log(device.id + " : " + output.toString().trim())
+      })
+    })
+  })
+  .then(function() {
+    console.log('Done.')
+  })
+  .catch(function(err) {
+    console.error('Something went wrong:', err.stack)
+  })
+}
 
 function list() {
   ls = spawn('ls', ['-al', '.']);
