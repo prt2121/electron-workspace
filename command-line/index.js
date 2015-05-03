@@ -3,6 +3,9 @@ var spawn = require('child_process').spawn;
 var Promise = require('bluebird');
 var adb = require('adbkit');
 var client = adb.createClient();
+var fs = require('fs');
+var StreamPng = require('StreamPng');
+var serial = document.querySelector('#serial');
 
 $('#ls-button').on('click', function () {
   console.log('ls');
@@ -10,9 +13,10 @@ $('#ls-button').on('click', function () {
 })
 
 $('#run-button').on('click', function () {
-  console.log('run');
+  console.log('run ' + serial.value);
   //run_cmd( "adb", ["devices"], function(code) { console.log (code) });
-  listFiles();
+  //listFiles();
+  screencap(serial.value);
 })
 
 function list() {
@@ -40,6 +44,31 @@ function run_cmd(cmd, args, callBack ) {
   child.stdout.on('end', function() { callBack (resp) });
 }
 
+function screencap(serial) {
+  client.screencap(serial, function(err, screencap){
+    var outfile = fs.createWriteStream('image.png');
+    var png = StreamPng(screencap);
+    png.out().pipe(outfile);
+  })
+
+  // client.listDevices()
+  // .then(function(devices) {
+  //   return Promise.map(devices, function(device) {
+  //     console.log('device.id ' + device.id)
+  //     return client.screencap(device.id)
+  //     .then(function(pngStream) {
+  //       var buf = new Buffer(pngStream, 'base64');
+  //       fs.writeFile('image.png', buf);
+  //     })
+  //   })
+  // })
+  // .then(function() {
+  //   console.log('Done!')
+  // })
+  // .catch(function(err) {
+  //   console.error('Something went wrong:', err.stack)
+  // })
+}
 //client.screencap(serial[, callback])
 
 function listFiles() {
