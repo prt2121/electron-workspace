@@ -14,8 +14,6 @@ $('#ls-button').on('click', function () {
 
 $('#run-button').on('click', function () {
   console.log('run ' + serial.value);
-  //run_cmd( "adb", ["devices"], function(code) { console.log (code) });
-  //listFiles();
   screencap(serial.value);
 })
 
@@ -45,31 +43,39 @@ function run_cmd(cmd, args, callBack ) {
 }
 
 function screencap(serial) {
-  client.screencap(serial, function(err, screencap){
+  if ((!serial || !serial.length)) {
+    client.listDevices()
+    .then(function(devices) {
+      return Promise.map(devices, function(device) {
+        console.log('device.id ' + device.id)
+        return capture(device.id)
+      })
+    })
+    .then(function() {
+      console.log('Done!')
+    })
+    .catch(function(err) {
+      console.error('Something went wrong:', err.stack)
+    })
+  } else {
+    capture(serial)
+  }
+}
+
+function capture(serial) {
+  client.screencap(serial)
+  .then(function(pngStream) {
     var outfile = fs.createWriteStream('image.png');
-    var png = StreamPng(screencap);
+    var png = StreamPng(pngStream);
     png.out().pipe(outfile);
   })
-
-  // client.listDevices()
-  // .then(function(devices) {
-  //   return Promise.map(devices, function(device) {
-  //     console.log('device.id ' + device.id)
-  //     return client.screencap(device.id)
-  //     .then(function(pngStream) {
-  //       var buf = new Buffer(pngStream, 'base64');
-  //       fs.writeFile('image.png', buf);
-  //     })
-  //   })
-  // })
-  // .then(function() {
-  //   console.log('Done!')
-  // })
-  // .catch(function(err) {
-  //   console.error('Something went wrong:', err.stack)
-  // })
+  .then(function() {
+    console.log('Done!')
+  })
+  .catch(function(err) {
+    console.error('Something went wrong:', err.stack)
+  })
 }
-//client.screencap(serial[, callback])
 
 function listFiles() {
   client.listDevices()
