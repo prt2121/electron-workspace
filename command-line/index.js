@@ -23,24 +23,15 @@ $('#command-button').on('click', function () {
   //run(command.value);
   run2(serial.value, command.value);
 })
-
+//T06200623T
 function run2(serial, script) {
-  client.listDevices()
+  var x = client.listDevices()
   .filter(function(device) { return isTargetDevice(device, serial) })
-  .map(function(device) {
-    console.log("device " + device.id)
-    return client.shell(device.id, script)
-    .then(adb.util.readAll)
-    .then(function(output) {
-      console.log(device.id + " : " + output.toString().trim())
-    })
-  })
-  .then(function() {
-    console.log('Done.')
-  })
-  .catch(function(err) {
-    console.error('Something went wrong:', err.stack)
-  })
+  .get(0)
+  .then(function(device) { return client.shell(device.id, script) })
+  .then(adb.util.readAll)
+  .then(function(output) { console.log(output.toString().trim()) })
+  .catch(function(err) { console.error('Something went wrong:', err.stack) })
 }
 
 function isTargetDevice(device, serial) {
