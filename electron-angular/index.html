@@ -4,10 +4,15 @@
   <title>Ng!</title>
   <link rel="stylesheet" href="./node_modules/angular-material/angular-material.css">
 </head>
-<body layout="vertical" md-theme="indigo" layout-fill>
-  <div ng-controller="MyController">
+<body>
+  <md-toolbar>
+      <div class="md-toolbar-tools">
+         <span>Materialized</span>
+      </div>
+   </md-toolbar>
+  <md-content class='md-padding' ng-controller="MyController">
     Hello {{greetMe}}!
-  </div>
+  </md-content>
   <script src="index.js"></script>
 </body>
 </html>
