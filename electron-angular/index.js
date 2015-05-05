@@ -6,7 +6,11 @@ var angularAria = require('angular-aria');
 angular.module('myApp', ['ngMaterial', 'ngAnimate', 'ngAria'])
 .config(function($mdThemingProvider) { $mdThemingProvider.theme('indigo').dark();})
 .controller('MyController', ['$scope', function ($scope) {
-  $scope.greetMe = 'World';
+  $scope.name = '';
+  // $scope.greetMe = 'World';
+  // if($scope.name) {
+  //   $scope.greetMe = $scope.name;
+  // }
 }]);
 
 angular.element(document).ready(function() {

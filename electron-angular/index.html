@@ -11,7 +11,11 @@
       </div>
    </md-toolbar>
   <md-content class='md-padding' ng-controller="MyController">
-    Hello {{greetMe}}!
+    <md-input-container>
+      <input ng-model='name'>
+    </md-input-container>
+    <br>
+    <md-button class="md-accent">Hello {{name}}!</md-button>
   </md-content>
   <script src="index.js"></script>
 </body>
