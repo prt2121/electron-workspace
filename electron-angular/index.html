@@ -3,6 +3,11 @@
 <head>
   <title>Ng!</title>
   <link rel="stylesheet" href="./node_modules/angular-material/angular-material.css">
+  <style>
+    .green {
+      background: #b9f6ca;
+    }
+  </style>
 </head>
 <body>
   <md-toolbar>
@@ -15,7 +20,7 @@
       <input ng-model='name'>
     </md-input-container>
     <br>
-    <md-button class="md-accent">Hello {{name}}!</md-button>
+    <md-button class="md-raised md-accent">Hello {{name}}!</md-button>
   </md-content>
   <script src="index.js"></script>
 </body>

@@ -4,7 +4,12 @@ var angularAnimate = require('angular-animate');
 var angularAria = require('angular-aria');
 
 angular.module('myApp', ['ngMaterial', 'ngAnimate', 'ngAria'])
-.config(function($mdThemingProvider) { $mdThemingProvider.theme('indigo').dark();})
+.config(function($mdThemingProvider) {
+  $mdThemingProvider.theme('default')
+    .primaryPalette('cyan')
+    .accentPalette('orange')
+    .dark();
+  })
 .controller('MyController', ['$scope', function ($scope) {
   $scope.name = '';
   // $scope.greetMe = 'World';
