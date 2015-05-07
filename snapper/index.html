@@ -17,12 +17,11 @@
       </div>
       <md-switch ng-model="switch.case" aria-label="Switch" ng-true-value="'vid'" ng-false-value="'pic'">
       </md-switch>
-      <!-- <div layout="column">
-        <md-select placeholder="Pick" ng-model="someVal">
-          <md-option value="1">One</md-option>
-          <md-option value="2">Two</md-option>
-        </md-select>
-      </div> -->
+    </div>
+    <div layout="row" layout-align="center center">
+      <md-button class="md-primary" ng-click="showListBottomSheet($event)">
+        Show Devices
+      </md-button>
     </div>
   </md-content>
   <script src="index.js"></script>
