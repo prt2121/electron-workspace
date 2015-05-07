@@ -24,10 +24,10 @@ angular.module('snapperApp', ['ngMaterial', 'ngAnimate', 'ngAria'])
 }])
 .controller('ListBottomSheetCtrl', function($scope, $mdBottomSheet) {
   $scope.items = [
-    { name: 'Share' },
-    { name: 'Upload' },
-    { name: 'Copy' },
-    { name: 'Print this page' },
+    { name: 'XXX1' },
+    { name: 'XXX2' },
+    { name: 'XXX3' },
+    { name: 'XXX4' },
   ];
   $scope.listItemClick = function($index) {
     var clickedItem = $scope.items[$index];

@@ -5,7 +5,11 @@
   <link rel="stylesheet" href="./node_modules/angular-material/angular-material.css">
 </head>
 <body>
-  <md-content class='md-padding' ng-controller="AppCtrl" layout-align="center center">
+  <md-content class='md-padding' ng-controller="AppCtrl" style="height: 400px;">
+    <div layout="row" layout-align="end">
+      <md-switch ng-model="switch.case" aria-label="Switch" ng-true-value="'vid'" ng-false-value="'pic'">
+      </md-switch>
+    </div>
     <div layout="row" layout-align="center center">
       <div ng-if="switch.case == 'vid'">
         <md-button class="md-fab md-accent">
@@ -15,8 +19,6 @@
         <md-button class="md-fab md-primary">
         </md-button>
       </div>
-      <md-switch ng-model="switch.case" aria-label="Switch" ng-true-value="'vid'" ng-false-value="'pic'">
-      </md-switch>
     </div>
     <div layout="row" layout-align="center center">
       <md-button class="md-primary" ng-click="showListBottomSheet($event)">
