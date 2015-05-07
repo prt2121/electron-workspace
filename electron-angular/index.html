@@ -4,23 +4,34 @@
   <title>Ng!</title>
   <link rel="stylesheet" href="./node_modules/angular-material/angular-material.css">
   <style>
-    .green {
-      background: #b9f6ca;
-    }
+  .green {
+    background: #b9f6ca;
+  }
   </style>
 </head>
 <body>
   <md-toolbar>
-      <div class="md-toolbar-tools">
-         <span>Materialized</span>
-      </div>
-   </md-toolbar>
+    <div class="md-toolbar-tools">
+      <span>Materialized</span>
+    </div>
+  </md-toolbar>
   <md-content class='md-padding' ng-controller="MyController">
     <md-input-container>
       <input ng-model='name'>
     </md-input-container>
     <br>
     <md-button class="md-raised md-accent">Hello {{name}}!</md-button>
+    <md-switch ng-model="switch.case" aria-label="Switch" ng-true-value="'vid'" ng-false-value="'pic'">
+      Switch: {{ switch.case }}
+    </md-switch>
+    <div ng-if="switch.case == 'vid'">
+      <md-button class="md-fab md-warn">
+      </md-button>
+    </div>
+    <div ng-if="switch.case == 'pic'">
+      <md-button class="md-fab md-primary">
+      </md-button>
+    </div>
   </md-content>
   <script src="index.js"></script>
 </body>
