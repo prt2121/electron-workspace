@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Snapper</title>
+  <link rel="stylesheet" href="./node_modules/angular-material/angular-material.css">
+</head>
+<body>
+  <md-content class='md-padding' ng-controller="AppCtrl" layout-align="center center">
+    <div layout="row" layout-align="center center">
+      <div ng-if="switch.case == 'vid'">
+        <md-button class="md-fab md-accent">
+        </md-button>
+      </div>
+      <div ng-if="switch.case != 'vid'">
+        <md-button class="md-fab md-primary">
+        </md-button>
+      </div>
+      <md-switch ng-model="switch.case" aria-label="Switch" ng-true-value="'vid'" ng-false-value="'pic'">
+      </md-switch>
+      <!-- <div layout="column">
+        <md-select placeholder="Pick" ng-model="someVal">
+          <md-option value="1">One</md-option>
+          <md-option value="2">Two</md-option>
+        </md-select>
+      </div> -->
+    </div>
+  </md-content>
+  <script src="index.js"></script>
+</body>
+</html>
