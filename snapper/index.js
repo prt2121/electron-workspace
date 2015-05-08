@@ -2,6 +2,9 @@ var angular = require('angular');
 var angularMaterial = require('angular-material');
 var angularAnimate = require('angular-animate');
 var angularAria = require('angular-aria');
+var Promise = require('bluebird');
+var adb = require('adbkit');
+var client = adb.createClient();
 
 angular.module('snapperApp', ['ngMaterial', 'ngAnimate', 'ngAria'])
 .config(function($mdThemingProvider) {
@@ -18,19 +21,19 @@ angular.module('snapperApp', ['ngMaterial', 'ngAnimate', 'ngAria'])
       controller: 'ListBottomSheetCtrl',
       targetEvent: $event
     }).then(function(clickedItem) {
-      console.log(clickedItem.name + ' clicked!')
+      console.log(clickedItem + ' clicked!')
     });
   };
 }])
 .controller('ListBottomSheetCtrl', function($scope, $mdBottomSheet) {
-  $scope.items = [
-    { name: 'XXX1' },
-    { name: 'XXX2' },
-    { name: 'XXX3' },
-    { name: 'XXX4' },
-  ];
+
+  $scope.items = [];
+
+  client.listDevices()
+  .map(function(device) { $scope.items.push(device); });
+
   $scope.listItemClick = function($index) {
-    var clickedItem = $scope.items[$index];
+    var clickedItem = $scope.items[$index].id;
     $mdBottomSheet.hide(clickedItem);
   };
 });
