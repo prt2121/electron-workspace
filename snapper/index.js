@@ -4,6 +4,8 @@ var angularAnimate = require('angular-animate');
 var angularAria = require('angular-aria');
 var Promise = require('bluebird');
 var adb = require('adbkit');
+var fs = require('fs');
+var StreamPng = require('StreamPng');
 var client = adb.createClient();
 
 angular.module('snapperApp', ['ngMaterial', 'ngAnimate', 'ngAria'])
@@ -14,6 +16,15 @@ angular.module('snapperApp', ['ngMaterial', 'ngAnimate', 'ngAria'])
   .dark();
 })
 .controller('AppCtrl', ['$scope', '$timeout', '$mdBottomSheet', function ($scope, $timeout, $mdBottomSheet) {
+
+  $scope.targetDevice = '';
+
+  $scope.screenCapture = function() {
+    if ($scope.targetDevice && $scope.targetDevice.length) {
+      screencap($scope.targetDevice);
+    }
+  }
+
   $scope.showListBottomSheet = function($event) {
     $scope.alert = '';
     $mdBottomSheet.show({
@@ -21,10 +32,11 @@ angular.module('snapperApp', ['ngMaterial', 'ngAnimate', 'ngAria'])
       controller: 'ListBottomSheetCtrl',
       targetEvent: $event
     }).then(function(clickedItem) {
-      console.log(clickedItem + ' clicked!')
-      run(clickedItem, "ls")
+      console.log(clickedItem + ' clicked!');
+      $scope.targetDevice = clickedItem;
     });
   };
+  
 }])
 .controller('ListBottomSheetCtrl', function($scope, $mdBottomSheet) {
 
@@ -43,15 +55,30 @@ angular.element(document).ready(function() {
   angular.bootstrap(document, ['snapperApp']);
 });
 
+//run(clickedItem, "ls")
+//screencap(clickedItem);
+//adb shell screenrecord /sdcard/vid.mp4
+//adb shell screencap -p /sdcard/screenshot.png
+function screencap(serial) {
+  client.screencap(serial)
+  .then(function(pngStream) {
+    var outfile = fs.createWriteStream('image.png');
+    var png = StreamPng(pngStream);
+    png.out().pipe(outfile);
+  })
+  .then(function() { console.log('Done!') })
+  .catch(function(err) { console.error('Something went wrong: ' + err.message) })
+}
+
 function run(serial, script) {
-  var x = client.listDevices()
+  client.listDevices()
   .filter(function(device) { return isTargetDevice(device, serial) })
   .get(0)
   .then(function(device) { return client.shell(device.id, script) })
   //.then(streamToPromise)
   .then(adb.util.readAll)
   .then(function(output) { console.log(output.toString().trim()) })
-  .catch(function(err) { console.error('Something went wrong:', err.stack) })
+  .catch(function(err) { console.error('Something went wrong:' + err.message) })
 }
 
 function streamToPromise(stream) {
