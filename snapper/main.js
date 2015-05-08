@@ -17,7 +17,7 @@ app.on('window-all-closed', function() {
 // This method will be called when Electron has done everything
 // initialization and ready for creating browser windows.
 app.on('ready', function() {
-  mainWindow = new BrowserWindow({width: 250, height: 250});
+  mainWindow = new BrowserWindow({width: 200, height: 200});
   mainWindow.loadUrl('file://' + __dirname + '/index.html');
 
   mainWindow.on('closed', function() {
