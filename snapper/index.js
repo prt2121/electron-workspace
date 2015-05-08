@@ -22,6 +22,7 @@ angular.module('snapperApp', ['ngMaterial', 'ngAnimate', 'ngAria'])
       targetEvent: $event
     }).then(function(clickedItem) {
       console.log(clickedItem + ' clicked!')
+      run(clickedItem, "ls")
     });
   };
 }])
@@ -41,3 +42,25 @@ angular.module('snapperApp', ['ngMaterial', 'ngAnimate', 'ngAria'])
 angular.element(document).ready(function() {
   angular.bootstrap(document, ['snapperApp']);
 });
+
+function run(serial, script) {
+  var x = client.listDevices()
+  .filter(function(device) { return isTargetDevice(device, serial) })
+  .get(0)
+  .then(function(device) { return client.shell(device.id, script) })
+  .then(streamToPromise)
+  .then(function(output) { console.log(output.toString().trim()) })
+  .catch(function(err) { console.error('Something went wrong:', err.stack) })
+}
+
+function streamToPromise(stream) {
+  return new Promise(function(resolve, reject) {
+    stream.on('data', function(chunk) { console.log('length ' + chunk.toString().trim()); });
+    stream.on("end", resolve);
+    stream.on("error", reject);
+  });
+}
+
+function isTargetDevice(device, serial) {
+  return device.id === serial
+}
