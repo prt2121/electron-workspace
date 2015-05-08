@@ -5,7 +5,7 @@
   <link rel="stylesheet" href="./node_modules/angular-material/angular-material.css">
 </head>
 <body>
-  <md-content class='md-padding' ng-controller="AppCtrl" style="height: 400px;">
+  <md-content class='md-padding' ng-controller="AppCtrl" style="height: 250px;">
     <div layout="row" layout-align="end">
       <md-switch ng-model="switch.case" aria-label="Switch" ng-true-value="'vid'" ng-false-value="'pic'">
       </md-switch>
@@ -22,7 +22,9 @@
     </div>
     <div layout="row" layout-align="center center">
       <md-button class="md-primary" ng-click="showListBottomSheet($event)">
-        Show Devices
+        <md-button class="md-icon-button md-primary" aria-label="Devices">
+          <md-icon md-svg-icon="img/ic_expand_more_48px.svg"></md-icon>
+        </md-button>
       </md-button>
     </div>
   </md-content>
