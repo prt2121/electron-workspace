@@ -22,7 +22,39 @@ $('#command-button').on('click', function () {
   //console.log('run ' + serial.value);
   //run(command.value);
   run2(serial.value, command.value);
+  //run2(serial.value, "pull /sdcard/tmp.mp4");
+  setTimeout(function (){
+    test(serial.value);
+  }, 1000);
+
 })
+
+function test(serial) {
+  client.listDevices()
+  .filter(function(device) { return isTargetDevice(device, serial) })
+  .get(0)
+  .then(function(device) {
+    console.log('test serial ' + serial);
+    console.log('test ' + device.id);
+    client.pull(serial, "/sdcard/tmp.mp4")
+    .then(function(transfer) {
+      return new Promise(function(resolve, reject) {
+        var fn = '/tmp/' + serial + '.tmp.mp4'
+        transfer.on('progress', function(stats) {
+          console.log(stats.bytesTransferred + ' bytes so far')
+        })
+        transfer.on('end', function() {
+          console.log('Pull complete')
+          resolve(serial)
+        })
+        transfer.on('error', reject)
+        transfer.pipe(fs.createWriteStream(fn))
+      })
+    })
+  })
+
+  // "device undefined"
+}
 
 function run2(serial, script) {
   var x = client.listDevices()
@@ -30,8 +62,8 @@ function run2(serial, script) {
   .get(0)
   .then(function(device) { return client.shell(device.id, script) })
   .then(streamToPromise)
-  //.then(adb.util.readAll)
-  .then(function(output) { console.log(output.toString().trim()) })
+  .then(adb.util.readAll)
+  //.then(function(output) { console.log(output.toString().trim()) })
   .catch(function(err) { console.error('Something went wrong:', err.stack) })
 }
 

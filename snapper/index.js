@@ -36,7 +36,7 @@ angular.module('snapperApp', ['ngMaterial', 'ngAnimate', 'ngAria'])
       $scope.targetDevice = clickedItem;
     });
   };
-  
+
 }])
 .controller('ListBottomSheetCtrl', function($scope, $mdBottomSheet) {
 
@@ -68,6 +68,10 @@ function screencap(serial) {
   })
   .then(function() { console.log('Done!') })
   .catch(function(err) { console.error('Something went wrong: ' + err.message) })
+}
+
+function screenrecord(serial) {
+  run(serial, "screenrecord /sdcard/tmp.mp4")
 }
 
 function run(serial, script) {
