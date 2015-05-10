@@ -24,36 +24,34 @@ $('#command-button').on('click', function () {
   run2(serial.value, command.value);
   //run2(serial.value, "pull /sdcard/tmp.mp4");
   setTimeout(function (){
-    test(serial.value);
+    pull(serial.value, '/sdcard/tmp.mp4');
   }, 1000);
 
 })
 
-function test(serial) {
+function pull(serial, path) {
   client.listDevices()
   .filter(function(device) { return isTargetDevice(device, serial) })
   .get(0)
   .then(function(device) {
-    console.log('test serial ' + serial);
-    console.log('test ' + device.id);
-    client.pull(serial, "/sdcard/tmp.mp4")
-    .then(function(transfer) {
-      return new Promise(function(resolve, reject) {
-        var fn = '/tmp/' + serial + '.tmp.mp4'
-        transfer.on('progress', function(stats) {
-          console.log(stats.bytesTransferred + ' bytes so far')
+    if(typeof device != 'undefined') {
+      client.pull(serial, path)
+      .then(function(transfer) {
+        return new Promise(function(resolve, reject) {
+          var fn = '/tmp/' + serial + '.tmp.mp4'
+          transfer.on('progress', function(stats) {
+            console.log(stats.bytesTransferred + ' bytes so far')
+          })
+          transfer.on('end', function() {
+            console.log('Pull complete')
+            resolve(serial)
+          })
+          transfer.on('error', reject)
+          transfer.pipe(fs.createWriteStream(fn))
         })
-        transfer.on('end', function() {
-          console.log('Pull complete')
-          resolve(serial)
-        })
-        transfer.on('error', reject)
-        transfer.pipe(fs.createWriteStream(fn))
-      })
-    })
-  })
-
-  // "device undefined"
+      });
+    }
+  });
 }
 
 function run2(serial, script) {
@@ -69,7 +67,7 @@ function run2(serial, script) {
 
 function streamToPromise(stream) {
   return new Promise(function(resolve, reject) {
-    stream.on('data', function(chunk) { console.log('length ' + chunk.toString().trim()); });
+    stream.on('data', function(chunk) { console.log('chunk ' + chunk.toString().trim()); });
     stream.on("end", resolve);
     stream.on("error", reject);
   });
