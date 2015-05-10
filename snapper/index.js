@@ -37,8 +37,10 @@ angular.module('snapperApp', ['ngMaterial', 'ngAnimate', 'ngAria'])
       controller: 'ListBottomSheetCtrl',
       targetEvent: $event
     }).then(function(clickedItem) {
-      console.log(clickedItem + ' clicked!');
-      $scope.targetDevice = clickedItem;
+      if(clickedItem !== 'no device') {
+        console.log(clickedItem + ' clicked!');
+        $scope.targetDevice = clickedItem;
+      }
     });
   };
 
@@ -54,6 +56,15 @@ angular.module('snapperApp', ['ngMaterial', 'ngAnimate', 'ngAria'])
     var clickedItem = $scope.items[$index].id;
     $mdBottomSheet.hide(clickedItem);
   };
+
+  $scope.hide = function() {
+    $mdBottomSheet.hide('no device');
+  };
+
+  $scope.isNoDevice = function() {
+    return $scope.items.length === 0;
+  }
+
 });
 
 angular.element(document).ready(function() {
