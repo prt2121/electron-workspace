@@ -12,11 +12,11 @@
       </md-switch>
     </div>
     <div layout="row" layout-align="center center">
-      <div ng-if="switch.case == 'vid'">
+      <div ng-show="isVid()">
         <md-button class="md-fab md-accent">
         </md-button>
       </div>
-      <div ng-if="switch.case != 'vid'">
+      <div ng-hide="isVid()">
         <md-button class="md-fab md-primary" ng-click="screenCapture()">
         </md-button>
       </div>

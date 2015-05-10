@@ -18,6 +18,11 @@ angular.module('snapperApp', ['ngMaterial', 'ngAnimate', 'ngAria'])
 .controller('AppCtrl', ['$scope', '$timeout', '$mdBottomSheet', function ($scope, $timeout, $mdBottomSheet) {
 
   $scope.targetDevice = '';
+  $scope.switch = '';
+
+  $scope.isVid = function() {
+    return $scope.switch.case == 'vid';
+  }
 
   $scope.screenCapture = function() {
     if ($scope.targetDevice && $scope.targetDevice.length) {
