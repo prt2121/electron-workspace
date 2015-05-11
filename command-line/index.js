@@ -59,7 +59,7 @@ function run2(serial, script) {
   .filter(function(device) { return isTargetDevice(device, serial) })
   .get(0)
   .then(function(device) { return client.shell(device.id, script) })
-  .then(streamToPromise)
+  //.then(streamToPromise)
   .then(adb.util.readAll)
   //.then(function(output) { console.log(output.toString().trim()) })
   .catch(function(err) { console.error('Something went wrong:', err.stack) })
