@@ -19,6 +19,7 @@ angular.module('snapperApp', ['ngMaterial', 'ngAnimate', 'ngAria'])
 
   $scope.targetDevice = '';
   $scope.switch = '';
+  $scope.recording = false;
 
   $scope.isVid = function() {
     return $scope.switch.case == 'vid';
@@ -27,6 +28,28 @@ angular.module('snapperApp', ['ngMaterial', 'ngAnimate', 'ngAria'])
   $scope.screenCapture = function() {
     if ($scope.targetDevice && $scope.targetDevice.length) {
       screencap($scope.targetDevice);
+    }
+  }
+
+  $scope.toggleRecording = function() {
+    if($scope.recording) {
+      $scope.stopRecord();
+    } else {
+      $scope.screenrecord();
+    }
+  }
+
+  $scope.screenrecord = function() {
+    if ($scope.targetDevice && $scope.targetDevice.length) {
+      screenrecord($scope.targetDevice);
+      $scope.recording = true;
+    }
+  }
+
+  $scope.stopRecord = function() {
+    if ($scope.targetDevice && $scope.targetDevice.length) {
+      stopAndPull($scope.targetDevice);
+      $scope.recording = false;
     }
   }
 
@@ -71,10 +94,23 @@ angular.element(document).ready(function() {
   angular.bootstrap(document, ['snapperApp']);
 });
 
-//run(clickedItem, "ls")
-//screencap(clickedItem);
-//adb shell screenrecord /sdcard/vid.mp4
-//adb shell screencap -p /sdcard/screenshot.png
+function stopAndPull(serial) {
+  client.listDevices()
+  .filter(function(device) { return isTargetDevice(device, serial) })
+  .get(0)
+  .then(function(device) { return client.shell(device.id, "ps  | grep screenrecord | awk '{print $2}'") })
+  //.then(streamToPromise)
+  .then(adb.util.readAll)
+  .then(function(output) {
+    run(serial, 'kill -2 ' + output.toString().trim());
+    // TODO
+    setTimeout(function (){
+      pull(serial, '/sdcard/tmp.mp4');
+    }, 200);
+  })
+  .catch(function(err) { console.error('Something went wrong:' + err.message) });
+}
+
 function screencap(serial) {
   client.screencap(serial)
   .then(function(pngStream) {
@@ -86,12 +122,37 @@ function screencap(serial) {
   .catch(function(err) { console.error('Something went wrong: ' + err.message) })
 }
 
+function pull(serial, path) {
+  client.listDevices()
+  .filter(function(device) { return isTargetDevice(device, serial) })
+  .get(0)
+  .then(function(device) {
+    if(typeof device != 'undefined') {
+      client.pull(serial, path)
+      .then(function(transfer) {
+        return new Promise(function(resolve, reject) {
+          var fn = serial + '.tmp.mp4'
+          transfer.on('progress', function(stats) {
+            console.log(stats.bytesTransferred + ' bytes so far')
+          })
+          transfer.on('end', function() {
+            console.log('Pull complete')
+            resolve(serial)
+          })
+          transfer.on('error', reject)
+          transfer.pipe(fs.createWriteStream(fn))
+        })
+      });
+    }
+  });
+}
+
 function screenrecord(serial) {
   run(serial, "screenrecord /sdcard/tmp.mp4")
 }
 
 function run(serial, script) {
-  client.listDevices()
+  return client.listDevices()
   .filter(function(device) { return isTargetDevice(device, serial) })
   .get(0)
   .then(function(device) { return client.shell(device.id, script) })
