@@ -155,6 +155,11 @@ function pull(serial, path) {
               transfer.on('error', reject)
               transfer.pipe(fs.createWriteStream(fn))
             })
+          })
+          .then(function(serial) {
+            setTimeout(function (){
+              run(serial, 'rm -f ' + path);
+            }, 1000);
           });
         }
       });
