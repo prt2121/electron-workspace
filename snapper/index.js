@@ -7,6 +7,7 @@ var adb = require('adbkit');
 var fs = require('fs');
 var StreamPng = require('StreamPng');
 var client = adb.createClient();
+var moment = require('moment');
 
 angular.module('snapperApp', ['ngMaterial', 'ngAnimate', 'ngAria'])
 .config(function($mdThemingProvider) {
@@ -112,14 +113,21 @@ function stopAndPull(serial) {
 }
 
 function screencap(serial) {
-  client.screencap(serial)
-  .then(function(pngStream) {
-    var outfile = fs.createWriteStream('image.png');
-    var png = StreamPng(pngStream);
-    png.out().pipe(outfile);
-  })
-  .then(function() { console.log('Done!') })
-  .catch(function(err) { console.error('Something went wrong: ' + err.message) })
+  mkdirIfNotExist('./snapperFiles/', 0744, function(err) {
+    if(err) {
+      console.log("Can't create a directory.");
+    } else {
+      var fileName = moment().format('[screencapture-]MMDDYY-hhmmss[.png]');
+      client.screencap(serial)
+      .then(function(pngStream) {
+        var outfile = fs.createWriteStream('./snapperFiles/' + fileName);
+        var png = StreamPng(pngStream);
+        png.out().pipe(outfile);
+      })
+      .then(function() { console.log('Done!') })
+      .catch(function(err) { console.error('Something went wrong: ' + err.message) })
+    }
+  });
 }
 
 function pull(serial, path) {
@@ -128,20 +136,27 @@ function pull(serial, path) {
   .get(0)
   .then(function(device) {
     if(typeof device != 'undefined') {
-      client.pull(serial, path)
-      .then(function(transfer) {
-        return new Promise(function(resolve, reject) {
-          var fn = serial + '.tmp.mp4'
-          transfer.on('progress', function(stats) {
-            console.log(stats.bytesTransferred + ' bytes so far')
-          })
-          transfer.on('end', function() {
-            console.log('Pull complete')
-            resolve(serial)
-          })
-          transfer.on('error', reject)
-          transfer.pipe(fs.createWriteStream(fn))
-        })
+      mkdirIfNotExist('./snapperFiles', 0744, function(err) {
+        if (err) {
+          console.log("Can't create a directory.");
+        } else {
+          var fileName = moment().format('[screenrecord-]MMDDYY-hhmmss[.mp4]');
+          client.pull(serial, path)
+          .then(function(transfer) {
+            return new Promise(function(resolve, reject) {
+              var fn = './snapperFiles/' + fileName;
+              transfer.on('progress', function(stats) {
+                console.log(stats.bytesTransferred + ' bytes so far')
+              })
+              transfer.on('end', function() {
+                console.log('Pull complete')
+                resolve(serial)
+              })
+              transfer.on('error', reject)
+              transfer.pipe(fs.createWriteStream(fn))
+            })
+          });
+        }
       });
     }
   });
@@ -172,4 +187,17 @@ function streamToPromise(stream) {
 
 function isTargetDevice(device, serial) {
   return device.id === serial
+}
+
+function mkdirIfNotExist(path, mask, cb) {
+  if (typeof mask == 'function') {
+    cb = mask;
+    mask = 0777;
+  }
+  fs.mkdir(path, mask, function(err) {
+    if (err) {
+      if (err.code == 'EEXIST') cb(null);
+      else cb(err);
+    } else cb(null);
+  });
 }
