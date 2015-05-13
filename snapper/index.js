@@ -29,6 +29,18 @@ angular.module('snapperApp', ['ngMaterial', 'ngAnimate', 'ngAria'])
   $scope.screenCapture = function() {
     if ($scope.targetDevice && $scope.targetDevice.length) {
       screencap($scope.targetDevice);
+    } else {
+      client.listDevices()
+      .then(function(devices) {
+        if(devices.length === 1) {
+          $scope.targetDevice = devices[0].id;
+          screencap($scope.targetDevice);
+        } else if(devices.length > 1) {
+          console.log("Tell a user to pick one...");
+        } else {
+          console.log("No device connected...");
+        }
+      });
     }
   }
 
@@ -44,6 +56,19 @@ angular.module('snapperApp', ['ngMaterial', 'ngAnimate', 'ngAria'])
     if ($scope.targetDevice && $scope.targetDevice.length) {
       screenrecord($scope.targetDevice);
       $scope.recording = true;
+    } else {
+      client.listDevices()
+      .then(function(devices) {
+        if(devices.length === 1) {
+          $scope.targetDevice = devices[0].id;
+          screenrecord($scope.targetDevice);
+          $scope.recording = true;
+        } else if(devices.length > 1) {
+          console.log("Tell a user to pick one...");
+        } else {
+          console.log("No device connected...");
+        }
+      });
     }
   }
 
