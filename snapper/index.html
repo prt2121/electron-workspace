@@ -21,13 +21,14 @@
         </md-button>
       </div>
     </div>
-    <div layout="row" layout-align="center center" class='rowSmall'>
+    <div layout="row" layout-align="center center" class='rowTiny'>
       <md-button class="md-primary" ng-click="showListBottomSheet($event)">
         <md-button class="md-icon-button md-primary" aria-label="Devices">
           <md-icon md-svg-icon="img/ic_expand_more_48px.svg"></md-icon>
         </md-button>
       </md-button>
     </div>
+    <md-progress-linear md-mode="indeterminate" ng-show="loading"></md-progress-linear>
   </md-content>
   <script src="index.js"></script>
 </body>

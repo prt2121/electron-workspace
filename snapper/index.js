@@ -21,6 +21,7 @@ angular.module('snapperApp', ['ngMaterial', 'ngAnimate', 'ngAria'])
   $scope.targetDevice = '';
   $scope.switch = '';
   $scope.recording = false;
+  $scope.loading = false;
 
   $scope.isVid = function() {
     return $scope.switch.case == 'vid';
@@ -28,13 +29,23 @@ angular.module('snapperApp', ['ngMaterial', 'ngAnimate', 'ngAria'])
 
   $scope.screenCapture = function() {
     if ($scope.targetDevice && $scope.targetDevice.length) {
-      screencap($scope.targetDevice);
+      $scope.loading = true;
+      screencap($scope.targetDevice, function(err) {
+        $scope.$apply(function() {
+          $scope.loading = false;
+        });
+      });
     } else {
       client.listDevices()
       .then(function(devices) {
         if(devices.length === 1) {
           $scope.targetDevice = devices[0].id;
-          screencap($scope.targetDevice);
+          $scope.loading = true;
+          screencap($scope.targetDevice, function(err) {
+            $scope.$apply(function() {
+              $scope.loading = false;
+            });
+          });
         } else if(devices.length > 1) {
           console.log("Tell a user to pick one...");
         } else {
@@ -74,7 +85,12 @@ angular.module('snapperApp', ['ngMaterial', 'ngAnimate', 'ngAria'])
 
   $scope.stopRecord = function() {
     if ($scope.targetDevice && $scope.targetDevice.length) {
-      stopAndPull($scope.targetDevice);
+      $scope.loading = true;
+      stopAndPull($scope.targetDevice, function(err) {
+        $scope.$apply(function() {
+          $scope.loading = false;
+        });
+      });
       $scope.recording = false;
     }
   }
@@ -120,7 +136,7 @@ angular.element(document).ready(function() {
   angular.bootstrap(document, ['snapperApp']);
 });
 
-function stopAndPull(serial) {
+function stopAndPull(serial, cb) {
   client.listDevices()
   .filter(function(device) { return isTargetDevice(device, serial) })
   .get(0)
@@ -131,16 +147,20 @@ function stopAndPull(serial) {
     run(serial, 'kill -2 ' + output.toString().trim());
     // TODO
     setTimeout(function (){
-      pull(serial, '/sdcard/tmp.mp4');
+      pull(serial, '/sdcard/tmp.mp4', cb);
     }, 200);
   })
-  .catch(function(err) { console.error('Something went wrong:' + err.message) });
+  .catch(function(err) {
+    console.error('Something went wrong:' + err.message);
+    cb(err.message);
+  });
 }
 
-function screencap(serial) {
+function screencap(serial, cb) {
   mkdirIfNotExist('./snapperFiles/', 0744, function(err) {
     if(err) {
       console.log("Can't create a directory.");
+      cb("Can't create a directory.");
     } else {
       var fileName = moment().format('[screencapture-]MMDDYY-hhmmss[.png]');
       client.screencap(serial)
@@ -149,13 +169,19 @@ function screencap(serial) {
         var png = StreamPng(pngStream);
         png.out().pipe(outfile);
       })
-      .then(function() { console.log('Done!') })
-      .catch(function(err) { console.error('Something went wrong: ' + err.message) })
+      .then(function() {
+        console.log('Done!');
+        cb(null);
+      })
+      .catch(function(err) {
+        console.error('Something went wrong: ' + err.message);
+        cb(err.message);
+      })
     }
   });
 }
 
-function pull(serial, path) {
+function pull(serial, path, cb) {
   client.listDevices()
   .filter(function(device) { return isTargetDevice(device, serial) })
   .get(0)
@@ -182,8 +208,9 @@ function pull(serial, path) {
             })
           })
           .then(function(serial) {
-            setTimeout(function (){
+            setTimeout(function () {
               run(serial, 'rm -f ' + path);
+              cb(null);
             }, 1000);
           });
         }

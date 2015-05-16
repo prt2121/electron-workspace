@@ -6,6 +6,10 @@
   height: 50px;
 }
 
+.rowTiny {
+  height: 42px;
+}
+
 .switchdSmall {
   margin:0px 0px 0px 0px;
   height: 35px;
